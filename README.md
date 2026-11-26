@@ -12,13 +12,19 @@ flutter create \
 The demo app displays the current platform, a working counter (state survives
 hot reload), and chips for every supported target.
 
+## CI status
+
+[![Android + Web](https://github.com/ayoade1012/platform_showcase/actions/workflows/build-android-web.yml/badge.svg)](https://github.com/ayoade1012/platform_showcase/actions/workflows/build-android-web.yml)
+[![Windows](https://github.com/ayoade1012/platform_showcase/actions/workflows/build-windows.yml/badge.svg)](https://github.com/ayoade1012/platform_showcase/actions/workflows/build-windows.yml)
+[![iOS](https://github.com/ayoade1012/platform_showcase/actions/workflows/build-ios.yml/badge.svg)](https://github.com/ayoade1012/platform_showcase/actions/workflows/build-ios.yml)
+
 ## Tool / target status on this Linux host
 
 | Target | Buildable here? | How |
 |---|---|---|
 | Web | Yes | `flutter build web --release` — verified |
 | Linux desktop | Yes | Root-free local toolchain via `source ./setup_env.sh` — verified |
-| Android | Yes | Existing SDK at `~/Android/Sdk` + `setup_env.sh` — build in progress/verified |
+| Android | Yes | Existing SDK at `~/Android/Sdk` + `setup_env.sh` — APK verified |
 | Windows desktop | No (needs Windows + Visual Studio) | GitHub Actions / Codemagic / Bitrise / local Windows (see `docs/windows.md`) |
 | iOS | No (needs macOS + Xcode) | GitHub Actions unsigned / Codemagic / Bitrise / local Mac (see `docs/ios.md`) |
 | macOS desktop | No (needs macOS + Xcode) | Same macOS routes as iOS |
@@ -45,6 +51,10 @@ flutter test
 - a root-free GTK3 dev sysroot in `~/.local/sysroot` with corrected pkg-config files
 
 Details: `docs/linux-toolchain.md`.
+
+For low-memory machines, `android/gradle.properties` caps the Gradle heap at
+2 GB and uses one worker with the Kotlin compiler in-process. This prevents the
+8 GB default from exhausting RAM while still building release APKs.
 
 ## Build commands
 
@@ -75,7 +85,9 @@ flutter build windows --release
    - `build-android-web.yml` (ubuntu-latest)
    - `build-windows.yml` (windows-latest)
    - `build-ios.yml` (macos-latest, unsigned)
-   Push this repo to GitHub; artifacts appear under each run's **Artifacts**.
+   This project is pushed to https://github.com/ayoade1012/platform_showcase;
+   every push to `main` starts all three workflows. Artifacts appear under each
+   run's **Artifacts** (`gh run list --repo ayoade1012/platform_showcase`).
 
 2. **Codemagic** — `codemagic.yaml`
    - workflows for Android+Web, Windows, and iOS
