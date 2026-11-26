@@ -1,0 +1,53 @@
+format_version: '11'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: flutter
+
+trigger_map:
+  - push_branch: main
+    workflow: android
+  - pull_request_source_branch: '*'
+    workflow: android
+
+workflows:
+  android:
+    title: Android + Web
+    steps:
+      - git-clone@8: {}
+      - flutter-installer@1:
+          inputs:
+            - version: 3.50.1
+      - flutter-test@1: {}
+      - flutter-build@1:
+          inputs:
+            - platform: android
+            - build_type: apk
+      - flutter-build@1:
+          inputs:
+            - platform: web
+      - deploy-to-bitrise-io@2: {}
+
+  ios:
+    title: iOS (signing required for device/TestFlight)
+    steps:
+      - git-clone@8: {}
+      - flutter-installer@1:
+          inputs:
+            - version: 3.50.1
+      - certificate-and-profile-installer@1: {}
+      - flutter-build@1:
+          inputs:
+            - platform: ios
+            - build_type: ipa
+      - deploy-to-bitrise-io@2: {}
+
+  windows:
+    title: Windows desktop
+    steps:
+      - git-clone@8: {}
+      - flutter-installer@1:
+          inputs:
+            - version: 3.50.1
+      - flutter-build@1:
+          inputs:
+            - platform: windows
+      - deploy-to-bitrise-io@2: {}
